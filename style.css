@@ -110,3 +110,5 @@ h2 { margin: 0; font-size: clamp(40px, 6vw, 72px); letter-spacing: 0.2em; font-w
   #ammo .count { font-size: 40px; }
   .controls { grid-template-columns: 1fr; }
 }
+
+body.nolock #app canvas { cursor: none; }

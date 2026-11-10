@@ -313,6 +313,18 @@ export function buildLevel(scene, M, quality) {
     B.add(new THREE.SphereGeometry(0.25, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), 'steelDark', M4(31.2, 0.6, z));
   }
 
+  // quay floodlights mounted on tall fence posts (unshadowed, cheap)
+  for (const z of [-9, 9]) {
+    B.add(new THREE.CylinderGeometry(0.07, 0.09, 6.2, 12), 'pmGray', M4(29.35, 3.1, z), { uv: 'world' });
+    B.add(new THREE.BoxGeometry(0.5, 0.3, 0.6), 'housing', M4(29.0, 6.1, z, 0, 0, 0.5));
+    B.add(new THREE.PlaneGeometry(0.42, 0.5), 'floodLens', M4(28.84, 5.97, z, -Math.PI / 2, 0.5, 0), { noShadow: true });
+    const s = new THREE.SpotLight(0xcfe0ff, 380, 32, 0.75, 0.6, 2);
+    s.position.set(28.7, 5.85, z); s.target.position.set(22, 0, z * 0.6);
+    s.userData.fogScale = 0.5;
+    lights.freeSpots = lights.freeSpots || [];
+    lights.freeSpots.push(s);
+  }
+
   // ---------------------------------------------------------------- props
   function barrier(x, z, alongZ) {
     const sh = new THREE.Shape();
@@ -395,6 +407,7 @@ export function buildLevel(scene, M, quality) {
     root.add(s); root.add(s.target);
   }
   for (const p of lights.points) root.add(p);
+  for (const s of lights.freeSpots || []) { root.add(s); root.add(s.target); }
 
   const hemi = new THREE.HemisphereLight(0x2a3a55, 0x0c0907, 0.6);
   root.add(hemi);

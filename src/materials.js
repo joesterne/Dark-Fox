@@ -140,6 +140,20 @@ export class MaterialLibrary {
       metalness: 1, roughness: 1, alphaTest: 0.5, alphaToCoverage: true, side: THREE.DoubleSide,
     }), { porosity: 0, key: 'chain' });
     M.chain.userData.tile = T.chain.tile;
+    {
+      // keep thin wires visible in the distance: boost alpha as the mip level rises
+      const prev = M.chain.onBeforeCompile;
+      M.chain.onBeforeCompile = (sh, r) => {
+        prev(sh, r);
+        sh.fragmentShader = sh.fragmentShader.replace('#include <alphatest_fragment>', `
+          {
+            vec2 g = fwidth(vMapUv) * 1024.0;
+            float lod = max(0.0, log2(max(max(g.x, g.y), 1e-4)));
+            diffuseColor.a = clamp(diffuseColor.a * (1.0 + lod * 0.55), 0.0, 1.0);
+          }
+          #include <alphatest_fragment>`);
+      };
+    }
 
     M.glassDark = new THREE.MeshPhysicalMaterial({ color: 0x050607, roughness: 0.08, metalness: 0, clearcoat: 1, envMapIntensity: 1.2 });
 

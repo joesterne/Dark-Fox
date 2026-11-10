@@ -48,6 +48,7 @@ let sens = parseFloat(store.get('sens', '1')) || 1;
 addEventListener('keydown', (e) => {
   if (keymap[e.code]) { input[keymap[e.code]] = true; if (e.code === 'Space') e.preventDefault(); }
   if (game.state !== 'playing') return;
+  if (e.code === 'Escape' && game.noLock) pause();
   if (e.code === 'KeyR') weapon.startReload();
   if (e.code === 'KeyF') { weapon.toggleTorch(); $('torchtag').classList.toggle('on', weapon.torchOn); }
   if (e.code === 'F3') { $('fps').classList.toggle('hidden'); e.preventDefault(); }
@@ -61,15 +62,18 @@ addEventListener('mousedown', (e) => {
 addEventListener('mouseup', (e) => { if (e.button === 0) input.fire = false; if (e.button === 2) input.ads = false; });
 addEventListener('contextmenu', (e) => e.preventDefault());
 addEventListener('mousemove', (e) => {
-  if (game.state !== 'playing' || document.pointerLockElement !== renderer.domElement) return;
+  if (game.state !== 'playing' || (document.pointerLockElement !== renderer.domElement && !game.noLock)) return;
   const adsK = weapon ? 1 - weapon.ads * 0.35 : 1;
   const s = 0.0022 * sens * adsK;
   player.look(e.movementX, e.movementY, s);
   weapon.lookDelta.x += e.movementX; weapon.lookDelta.y += e.movementY;
 });
 document.addEventListener('pointerlockchange', () => {
-  if (document.pointerLockElement !== renderer.domElement && game.state === 'playing') pause();
+  if (document.pointerLockElement === renderer.domElement) game.wasLocked = true;
+  else if (game.state === 'playing' && !game.noLock) pause();
 });
+// Some embedded contexts (sandboxed iframes) refuse pointer lock: fall back to raw mouse deltas.
+document.addEventListener('pointerlockerror', () => { game.noLock = true; document.body.classList.add('nolock'); });
 addEventListener('blur', () => { for (const k in input) input[k] = false; });
 
 // ------------------------------------------------------------------------------------------------ loading
@@ -209,7 +213,11 @@ function notify(text, kill = false) {
 
 // ------------------------------------------------------------------------------------------------ flow
 function lockPointer() {
-  try { const p = renderer.domElement.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch { /* ignore */ }
+  if (game.noLock) return;
+  try {
+    const p = renderer.domElement.requestPointerLock();
+    if (p && p.catch) p.catch(() => { game.noLock = true; document.body.classList.add('nolock'); });
+  } catch { game.noLock = true; document.body.classList.add('nolock'); }
 }
 
 function startGame(headless = false) {
@@ -295,6 +303,18 @@ function frame() {
   const playing = game.state === 'playing';
   const simDt = playing ? dt : 0;
 
+  if (playing && params.has('aimbot')) {
+    // debug: aim at the nearest drone and fire (used for automated testing)
+    const alive = drones.drones.filter(d => d.alive);
+    if (alive.length) {
+      const eye = world.camera.position;
+      alive.sort((a, b) => a.pos.distanceTo(eye) - b.pos.distanceTo(eye));
+      const t = alive[0].pos.clone().sub(eye);
+      player.yaw = Math.atan2(-t.x, -t.z); player.pitch = Math.atan2(t.y, Math.hypot(t.x, t.z));
+      input.fire = true; input.ads = true;
+    } else { input.fire = false; input.ads = false; }
+    if (weapon.ammo === 0) weapon.startReload();
+  }
   if (playing) {
     game.missionTime += dt;
     player.update(simDt, input);

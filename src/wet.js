@@ -188,9 +188,9 @@ function patchReflective(mat, refl, mask, opts) {
         float NdV = clamp(dot(normal, -V) , 0.0, 1.0);
         float F = 0.02 + 0.98 * pow(1.0 - NdV, 5.0);
         vec2 ruv = vReflCoord.xy / vReflCoord.w;
-        ruv += gRip * ${opts.water ? '0.06' : '0.035'};
+        ruv += gRip * ${opts.water ? '0.045' : '0.035'};
         float rough = clamp(roughnessFactor, 0.0, 1.0);
-        float lod = rough * 7.0;
+        float lod = rough * 7.0 + ${opts.water ? '1.6' : '0.0'};
         vec3 rc = vec3(0.0);
         float stretch = (0.004 + rough * 0.05);
         rc += textureLod(uRefl, ruv + vec2(0.0, -2.0 * stretch), lod + 1.0).rgb * 0.12;

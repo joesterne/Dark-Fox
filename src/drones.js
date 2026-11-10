@@ -148,7 +148,7 @@ export class DroneManager {
     m.g.position.copy(pos);
     this.scene.add(m.g);
     const d = {
-      ...m, pos: pos.clone(), vel: V(0, 0, 0), yaw: Math.random() * 6.28, hp: 100, state: 'patrol', stateT: 0,
+      ...m, pos: pos.clone(), vel: V(0, 0, 0), yaw: Math.random() * 6.28, hp: 140, state: 'patrol', stateT: 0,
       wp: Math.floor(Math.random() * this.waypoints.length), target: V(), lastSeen: V(), seenT: 0, burst: 0,
       fireT: 1 + Math.random(), orbitA: Math.random() * 6.28, alive: true, hum: this.audio?.droneHum(), sweep: Math.random() * 6,
       hitFlash: 0, id: this.spawned,

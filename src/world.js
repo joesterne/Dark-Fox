@@ -26,6 +26,7 @@ export class World {
       ...this.lib.steps(),
       ['Assembling yard', () => {
         this.level = buildLevel(this.scene, this.lib.mats, this.q);
+        this.freeSpots.push(...(this.level.lights.freeSpots || []));
         this.sky = buildSky(this.scene, this.lib.mats, this.time);
         this.refl = new PlanarReflection(this.renderer, this.q.reflScale, this.q.reflScale > 0);
         const g = buildGround(this.scene, this.lib, this.refl, this.time);

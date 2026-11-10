@@ -416,7 +416,8 @@ export class Pipeline {
     const r = this.renderer;
     const P = this.params;
     this.time.value += dt;
-    r.shadowMap.needsUpdate = true;
+    this.frame = (this.frame || 0) + 1;
+    if (this.frame % (this.q.shadowInterval || 1) === 0 || this.frame < 4) r.shadowMap.needsUpdate = true;
     if (refl) refl.update(scene, camera, reflHidden);
 
     // 1. scene
