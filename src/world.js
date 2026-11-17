@@ -88,7 +88,7 @@ export class World {
     const r = this.renderer;
     const cubeRT = new THREE.WebGLCubeRenderTarget(128, { type: THREE.HalfFloatType });
     const cubeCam = new THREE.CubeCamera(0.1, 1500, cubeRT);
-    cubeCam.position.set(0, 2.2, 2);
+    cubeCam.position.set(2, 4.5, 6);
     this.scene.add(cubeCam);
     const vis = hidden.map(o => o.visible);
     hidden.forEach(o => (o.visible = false));

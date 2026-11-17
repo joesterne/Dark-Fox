@@ -15,6 +15,16 @@ function vmPatch(mat, U) {
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nuniform mat4 uVMProj;')
       .replace('#include <project_vertex>', '#include <project_vertex>\n  gl_Position = uVMProj * mvPosition;\n  gl_Position.z = gl_Position.z * 0.03 - 0.97 * gl_Position.w;');
+    // faint cool rim so the dark weapon keeps a readable silhouette against the night
+    if (sh.fragmentShader.includes('#include <opaque_fragment>')) {
+      sh.fragmentShader = sh.fragmentShader.replace('#include <opaque_fragment>', `
+        {
+          float ndv = clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0);
+          float up = clamp(dot(normal, normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz)) * 0.5 + 0.5, 0.0, 1.0);
+          outgoingLight += vec3(0.020, 0.024, 0.034) * pow(1.0 - ndv, 3.0) * (0.4 + 0.6 * up);
+        }
+        #include <opaque_fragment>`);
+    }
   };
   mat.customProgramCacheKey = () => 'viewmodel-' + mat.uuid.slice(0, 4);
   return mat;

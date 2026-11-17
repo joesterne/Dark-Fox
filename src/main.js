@@ -279,11 +279,30 @@ $('sens').value = sens;
 $('sens').addEventListener('input', (e) => { sens = parseFloat(e.target.value); store.set('sens', sens); });
 renderer.domElement.addEventListener('click', () => { if (game.state === 'playing' && document.pointerLockElement !== renderer.domElement) lockPointer(); });
 
+// Internal render scale (dynamic resolution). The final pass always outputs at full canvas size.
+let renderScale = 1;
 function resize() {
   const w = window.innerWidth, h = window.innerHeight;
   renderer.setSize(w, h);
-  const pw = Math.floor(w * renderer.getPixelRatio()), ph = Math.floor(h * renderer.getPixelRatio());
+  const pw = Math.max(64, Math.floor(w * renderer.getPixelRatio() * renderScale));
+  const ph = Math.max(64, Math.floor(h * renderer.getPixelRatio() * renderScale));
   if (world.pipeline) world.setSize(pw, ph);
+}
+
+// Adaptive resolution: watch real frame times while playing and trade internal resolution for frame rate.
+const adapt = { acc: 0, n: 0, cool: 0, enabled: !params.has('fixeddt') && !params.has('noadapt') };
+function adaptResolution(realDt) {
+  if (!adapt.enabled || game.state !== 'playing') return;
+  adapt.cool -= realDt;
+  adapt.acc += realDt; adapt.n++;
+  if (adapt.acc < 1.5) return;
+  const fps = adapt.n / adapt.acc;
+  adapt.acc = 0; adapt.n = 0;
+  if (adapt.cool > 0) return;
+  let next = renderScale;
+  if (fps < 48 && renderScale > 0.55) next = Math.max(0.55, renderScale - (fps < 32 ? 0.15 : 0.08));
+  else if (fps > 72 && renderScale < 1) next = Math.min(1, renderScale + 0.08);
+  if (next !== renderScale) { renderScale = next; resize(); adapt.cool = 3; }
 }
 addEventListener('resize', resize);
 
@@ -360,8 +379,11 @@ function frame() {
   world.render(dt);
   if (playing || game.state === 'paused') updateHUD(dt);
 
-  fpsAcc += dt; fpsN++;
-  if (fpsN >= 30) { $('fps').textContent = `${Math.round(fpsN / fpsAcc)} FPS · ${quality.name}`; fpsAcc = 0; fpsN = 0; }
+  const realDt = Math.min(clock.elapsedTime - (frame.last ?? clock.elapsedTime), 0.25);
+  frame.last = clock.elapsedTime;
+  adaptResolution(realDt);
+  fpsAcc += realDt; fpsN++;
+  if (fpsN >= 30) { $('fps').textContent = `${Math.round(fpsN / Math.max(fpsAcc, 1e-3))} FPS · ${quality.name} · ${Math.round(renderScale * 100)}% res`; fpsAcc = 0; fpsN = 0; }
   if (playing) playFrames++;
   if (haltAfter && playFrames >= haltAfter && !window.__done) window.__done = 'ok';
 }
