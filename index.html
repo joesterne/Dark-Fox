@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dark Fox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app"></div>
+
+<div id="loading" class="screen">
+  <div class="brand">
+    <svg class="fox" viewBox="-60 -60 120 120" aria-hidden="true"><path d="M-55 -78 L-28 -36 L28 -36 L55 -78 L46 -8 L0 50 L-46 -8 Z M-27 -6 L-9 0 M9 0 L27 -6 M-6 36 L0 42 L6 36" transform="translate(0,14) scale(0.9)"/></svg>
+    <h1>DARK&nbsp;FOX</h1>
+    <p class="sub">OPERATION // HARROWGATE YARD</p>
+  </div>
+  <div class="loadbar"><div id="loadfill"></div></div>
+  <div id="loadlabel" class="mono">Initialising renderer</div>
+</div>
+
+<div id="menu" class="screen hidden">
+  <div class="menu-inner">
+    <div class="brand small">
+      <svg class="fox" viewBox="-60 -60 120 120" aria-hidden="true"><path d="M-55 -78 L-28 -36 L28 -36 L55 -78 L46 -8 L0 50 L-46 -8 Z M-27 -6 L-9 0 M9 0 L27 -6 M-6 36 L0 42 L6 36" transform="translate(0,14) scale(0.9)"/></svg>
+      <h1>DARK&nbsp;FOX</h1>
+    </div>
+    <div class="briefing">
+      <div class="tag mono">BRIEFING</div>
+      <p>02:14 local. Heavy rain over the Harrowgate container yard. An autonomous security grid is guarding the warehouse we need inside.</p>
+      <p>Take down all <b>six</b> patrol drones, then exfiltrate through the service door under the neon sign.</p>
+    </div>
+    <button id="deploy" class="btn">DEPLOY</button>
+    <div class="settings">
+      <label>Graphics
+        <select id="quality">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="ultra">Ultra</option>
+        </select>
+      </label>
+      <label>Mouse sensitivity <input id="sens" type="range" min="0.4" max="3" step="0.05" value="1"></label>
+    </div>
+    <div class="controls mono">
+      <span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>LMB</kbd> fire</span><span><kbd>RMB</kbd> aim down sights</span>
+      <span><kbd>Shift</kbd> sprint</span><span><kbd>C</kbd> crouch</span><span><kbd>Space</kbd> jump</span><span><kbd>R</kbd> reload</span>
+      <span><kbd>F</kbd> weapon light</span><span><kbd>Esc</kbd> pause</span>
+    </div>
+  </div>
+</div>
+
+<div id="hud" class="hidden">
+  <div id="crosshair"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i><i class="d"></i></div>
+  <div id="hitmarker"><i></i><i></i><i></i><i></i></div>
+  <div id="objective">
+    <div class="tag mono">OBJECTIVE</div>
+    <div id="objtext">Neutralise security drones</div>
+    <div id="objcount" class="mono">0 / 6</div>
+  </div>
+  <div id="marker" class="hidden"><div class="diamond"></div><div id="markerdist" class="mono">0m</div></div>
+  <div id="notify"></div>
+  <div id="health">
+    <div class="label mono">VITALS</div>
+    <div class="bar"><div id="healthfill"></div></div>
+  </div>
+  <div id="ammo">
+    <div class="weapon mono">DF-9 CARBINE <span id="torchtag">· LIGHT</span></div>
+    <div class="count"><span id="mag">30</span><span class="slash">/</span><span id="reserve">150</span></div>
+    <div id="pips"></div>
+  </div>
+  <div id="dmgdir"></div>
+  <div id="alert" class="mono">DETECTED</div>
+  <div id="fps" class="mono hidden"></div>
+</div>
+
+<div id="pause" class="screen hidden">
+  <div class="menu-inner center">
+    <h2>PAUSED</h2>
+    <button id="resume" class="btn">RESUME</button>
+  </div>
+</div>
+
+<div id="end" class="screen hidden">
+  <div class="menu-inner center">
+    <h2 id="endtitle">MISSION COMPLETE</h2>
+    <div id="endstats" class="mono"></div>
+    <button id="again" class="btn">REDEPLOY</button>
+  </div>
+</div>
+
+<script src="dist/darkfox.js"></script>
+</body>
+</html>
