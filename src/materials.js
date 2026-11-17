@@ -137,7 +137,7 @@ export class MaterialLibrary {
 
     M.chain = applyWet(new THREE.MeshStandardMaterial({
       map: T.chain.map, normalMap: T.chain.normalMap, roughnessMap: T.chain.ormMap, metalnessMap: T.chain.ormMap,
-      metalness: 1, roughness: 1, alphaTest: 0.2, alphaToCoverage: true, side: THREE.DoubleSide,
+      metalness: 1, roughness: 1, side: THREE.DoubleSide,
     }), { porosity: 0, key: 'chain' });
     M.chain.userData.tile = T.chain.tile;
     {
@@ -151,6 +151,10 @@ export class MaterialLibrary {
             float lod = max(0.0, log2(max(max(g.x, g.y), 1e-4)));
             float far = clamp(lod / 3.0, 0.0, 1.0);
             diffuseColor.a = min(clamp(diffuseColor.a * (1.0 + lod * 0.25), 0.0, 1.0), mix(1.0, 0.28, far));
+            // stochastic (screen-dithered) transparency: works with or without MSAA
+            float dither = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+            if (diffuseColor.a < mix(0.5, dither * 0.9 + 0.05, far)) discard;
+            diffuseColor.a = 1.0;
           }
           #include <alphatest_fragment>`);
       };

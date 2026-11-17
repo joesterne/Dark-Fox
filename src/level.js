@@ -466,7 +466,7 @@ function fence(B, a, b, height) {
   // mesh panel
   const pg = new THREE.PlaneGeometry(len, height - 0.1);
   scaleUV(pg, len / B.materials.chain.userData.tile[0], (height - 0.1) / B.materials.chain.userData.tile[1]);
-  B.add(pg, 'chain', M4(mid.x, a.y + height / 2 + 0.02, mid.z, ang + Math.PI / 2), { uv: 'local' });
+  B.add(pg, 'chain', M4(mid.x, a.y + height / 2 + 0.02, mid.z, ang + Math.PI / 2), { uv: 'local', noShadow: true });
   // barbed wire coils
   const side = new THREE.Vector3(dir.z, 0, -dir.x);
   for (const off of [0]) {
