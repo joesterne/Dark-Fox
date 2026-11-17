@@ -155,7 +155,7 @@ function setupGameplay() {
     }
   };
   drones.onPlayerHit = (from) => {
-    game.damageTaken += 9;
+    game.damageTaken += 8;
     game.damageFlash = 1;
     audio.playerHurt();
     const to = from.clone().sub(player.pos);

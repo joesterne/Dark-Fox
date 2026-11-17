@@ -262,7 +262,7 @@ export class DroneManager {
         case 'alert': {
           desired = d.pos.clone();
           faceTarget = playerHead;
-          if (d.stateT > 0.7) { d.state = 'attack'; d.stateT = 0; d.fireT = 0.4; }
+          if (d.stateT > 0.9) { d.state = 'attack'; d.stateT = 0; d.fireT = 0.8; }
           break;
         }
         case 'attack': {
@@ -383,7 +383,7 @@ export class DroneManager {
     d.body.updateWorldMatrix(true, false);
     const muzzle = V(-0.09, -0.09, -0.34).applyMatrix4(d.body.matrixWorld);
     const lead = player.velocity.clone().multiplyScalar(muzzle.distanceTo(aimAt) / 38 * 0.6);
-    const spread = 0.025 + Math.min(1, player.horizSpeed / 6) * 0.03 + (player.crouchAmt * -0.008);
+    const spread = 0.045 + Math.min(1, player.horizSpeed / 6) * 0.04 - player.crouchAmt * 0.01 + Math.max(0, muzzle.distanceTo(aimAt) - 10) * 0.002;
     const dir = aimAt.clone().add(lead).sub(muzzle).normalize();
     dir.x += (Math.random() - 0.5) * spread * 2; dir.y += (Math.random() - 0.5) * spread * 2; dir.z += (Math.random() - 0.5) * spread * 2;
     dir.normalize();
@@ -405,7 +405,7 @@ export class DroneManager {
       const proj = THREE.MathUtils.clamp(-oc.dot(dir), 0, len);
       const closest = b.pos.clone().addScaledVector(dir, proj);
       if (player.alive && closest.distanceTo(chest) < 0.45) {
-        player.damage(9, b.pos);
+        player.damage(8, b.pos);
         this.onPlayerHit?.(b.pos);
         continue;
       }
