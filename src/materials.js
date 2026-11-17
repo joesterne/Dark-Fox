@@ -150,7 +150,7 @@ export class MaterialLibrary {
             vec2 g = fwidth(vMapUv) * 1024.0;
             float lod = max(0.0, log2(max(max(g.x, g.y), 1e-4)));
             float far = clamp(lod / 3.0, 0.0, 1.0);
-            diffuseColor.a = min(clamp(diffuseColor.a * (1.0 + lod * 0.35), 0.0, 1.0), mix(1.0, 0.45, far));
+            diffuseColor.a = min(clamp(diffuseColor.a * (1.0 + lod * 0.25), 0.0, 1.0), mix(1.0, 0.28, far));
           }
           #include <alphatest_fragment>`);
       };
